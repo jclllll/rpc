@@ -4,12 +4,16 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.example</groupId>
+  <groupId>com.lrpc</groupId>
   <artifactId>LRPC</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <modules>
     <module>demo</module>
+    <module>LRPC-Demo</module>
+    <module>LRPC-Demo/LRPC-producer</module>
+    <module>LRPC-Demo/LRPC-client</module>
+    <module>LRPC-Demo/LRPC-api</module>
   </modules>
 
   <properties>
@@ -19,6 +23,10 @@
     <netty-version>4.1.95.Final</netty-version>
     <junit-version>4.13.2</junit-version>
     <zookeeper-version>3.8.2</zookeeper-version>
+    <lombok.version>1.18.26</lombok.version>
+    <logback.version>1.4.5</logback.version>
+    <fastjson.version>2.0.34</fastjson.version>
+    <apache-commons.version>3.12.0</apache-commons.version>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -38,19 +46,36 @@
         <artifactId>zookeeper</artifactId>
         <version>${zookeeper-version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <version>${lombok.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-core</artifactId>
+        <version>${logback.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.alibaba.fastjson2</groupId>
+        <artifactId>fastjson2</artifactId>
+        <version>${fastjson.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
+        <version>${apache-commons.version}</version>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
-
 
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.zookeeper</groupId>
-      <artifactId>zookeeper</artifactId>
     </dependency>
 
   </dependencies>
