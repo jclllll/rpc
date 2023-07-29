@@ -1,16 +1,14 @@
 package com.lrpc.manager;
 
-import ch.qos.logback.classic.LoggerContext;
 import com.lrpc.common.Constant;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.zookeeper.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 
+@Slf4j
 public class Application {
-	static Logger log=LoggerFactory.getLogger(Application.class);
 	public static void main(String[] args) {
 		//创建基础目录
 		ZooKeeper zooKeeper;
@@ -46,7 +44,7 @@ public class Application {
 				log.info("create [{}] success",result);
 			}
 		} catch (IOException | InterruptedException | KeeperException e) {
-			log.error("create basic node fail,error message is {}",e.toString());
+			log.error("create basic node fail,error message is {}",e.getMessage());
 			throw new RuntimeException(e);
 		}
 		log.info("zookeeper node is created");
