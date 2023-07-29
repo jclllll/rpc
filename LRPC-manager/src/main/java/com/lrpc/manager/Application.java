@@ -31,19 +31,22 @@ public class Application {
 			final String producerPath = basePath + "/producers";
 			final String consumerPath = basePath + "/consumers";
 			if(zooKeeper.exists(basePath,null)==null) {
-				zooKeeper.create(basePath, null,
+				String result = zooKeeper.create(basePath, null,
 					ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+				log.info("create [{}] success",result);
 			}
 			if(zooKeeper.exists(producerPath,null)==null) {
-				zooKeeper.create(producerPath, null,
+				String result = zooKeeper.create(producerPath, null,
 					ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+				log.info("create [{}] success",result);
 			}
 			if(zooKeeper.exists(consumerPath,null)==null) {
-				zooKeeper.create(consumerPath, null,
+				String result = zooKeeper.create(consumerPath, null,
 					ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+				log.info("create [{}] success",result);
 			}
-
 		} catch (IOException | InterruptedException | KeeperException e) {
+			log.error("create basic node fail,error message is {}",e.toString());
 			throw new RuntimeException(e);
 		}
 		log.info("zookeeper node is created");
