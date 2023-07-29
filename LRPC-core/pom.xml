@@ -8,25 +8,13 @@
     <artifactId>LRPC</artifactId>
     <version>1.0-SNAPSHOT</version>
   </parent>
-  <modules>
-    <module>LRPC-producer</module>
-    <module>LRPC-client</module>
-    <module>LRPC-api</module>
-  </modules>
 
-  <artifactId>LRPC-Demo</artifactId>
+  <artifactId>LRPC-core</artifactId>
 
   <properties>
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
-  <packaging>pom</packaging>
-  <dependencies>
-    <dependency>
-      <groupId>com.lrpc</groupId>
-      <artifactId>LRPC-core</artifactId>
-      <version>1.0-SNAPSHOT</version>
-    </dependency>
-  </dependencies>
+
 </project>

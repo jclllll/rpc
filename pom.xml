@@ -11,9 +11,7 @@
   <modules>
     <module>demo</module>
     <module>LRPC-Demo</module>
-    <module>LRPC-Demo/LRPC-producer</module>
-    <module>LRPC-Demo/LRPC-client</module>
-    <module>LRPC-Demo/LRPC-api</module>
+    <module>LRPC-core</module>
   </modules>
 
   <properties>
