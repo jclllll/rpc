@@ -17,11 +17,11 @@ public class Application {
 			ZooKeeper zooKeeper = ZookeeperUtil.createZookeeper("127.0.0.1", 2181);
 			//定义节点和数据
 			ZookeeperNode baseNode = new ZookeeperNode("/lrpc-metadata", null);
-			ZookeeperNode producerNode = new ZookeeperNode("/lrpc-metadata/producers", null);
+			ZookeeperNode providerNode = new ZookeeperNode("/lrpc-metadata/providers", null);
 			ZookeeperNode consumerNode = new ZookeeperNode("/lrpc-metadata/consumers", null);
 
 
-			List.of(baseNode, producerNode, consumerNode).forEach(
+			List.of(baseNode, providerNode, consumerNode).forEach(
 				node -> {
 					ZookeeperUtil.createZookeeperNode(zooKeeper,node,null,CreateMode.PERSISTENT);
 					log.info("Node {} is create success",node.getNodePath());

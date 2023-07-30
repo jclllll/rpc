@@ -13,7 +13,11 @@ public class LRPCBootstrap {
 	private LRPCBootstrap() {
 	}
 
-	private String applicationName;
+	private String applicationName = "defaule";
+
+	private RegistryConfig registryConfig;
+
+	private ProtocolConfig protocolConfig;
 
 	/**
 	 * 此处使用饿汉式单例
@@ -36,6 +40,7 @@ public class LRPCBootstrap {
 	 * @return
 	 */
 	public LRPCBootstrap registry(RegistryConfig registry) {
+		this.registryConfig = registry;
 		return this;
 	}
 
@@ -49,6 +54,7 @@ public class LRPCBootstrap {
 		if (log.isDebugEnabled()) {
 			log.debug("protocol config {} for serializable", protocol.toString());
 		}
+		this.protocolConfig = protocol;
 		return this;
 	}
 

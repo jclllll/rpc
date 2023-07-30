@@ -9,7 +9,7 @@
     <version>1.0-SNAPSHOT</version>
   </parent>
   <modules>
-    <module>LRPC-producer</module>
+    <module>LRPC-provider</module>
     <module>LRPC-client</module>
     <module>LRPC-api</module>
   </modules>
