@@ -1,5 +1,6 @@
 package com.lrpc;
 
+import com.lrpc.common.Constant;
 import com.lrpc.conf.ProtocolConfig;
 import com.lrpc.conf.ReferenceConfig;
 import com.lrpc.conf.RegistryConfig;
@@ -65,6 +66,7 @@ public class LRPCBootstrap {
 	 * @return
 	 */
 	public LRPCBootstrap publish(ServiceConfig service) {
+
 		if (log.isDebugEnabled()) {
 			log.debug("service {} is be register", service.getInterfaceProvider().getName());
 		}
