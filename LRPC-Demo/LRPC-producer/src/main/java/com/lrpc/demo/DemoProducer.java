@@ -6,7 +6,7 @@ import com.lrpc.conf.RegistryConfig;
 import com.lrpc.conf.ServiceConfig;
 import com.lrpc.demo.impl.DemoApiHelloImpl;
 
-public class Demoprovider {
+public class DemoProducer {
 	public static void main(String[] args) {
 		ServiceConfig<DemoApiHello> server = new ServiceConfig<>();
 		server.setInterfaceProvider(DemoApiHello.class);

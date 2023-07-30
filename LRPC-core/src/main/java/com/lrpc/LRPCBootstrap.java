@@ -68,6 +68,7 @@ public class LRPCBootstrap {
 		if (log.isDebugEnabled()) {
 			log.debug("service {} is be register", service.getInterfaceProvider().getName());
 		}
+
 		return this;
 	}
 
