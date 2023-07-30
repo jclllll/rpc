@@ -1,14 +1,11 @@
 package com.lrpc;
 
-import com.lrpc.common.utils.zookeeper.ZookeeperUtil;
 import com.lrpc.conf.ProtocolConfig;
 import com.lrpc.conf.ReferenceConfig;
 import com.lrpc.conf.RegistryConfig;
 import com.lrpc.conf.ServiceConfig;
 import com.lrpc.discovery.Registry;
-import com.lrpc.discovery.impl.ZookeeperRegistry;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.zookeeper.ZooKeeper;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -89,6 +86,7 @@ public class LRPCBootstrap {
      * @return
      */
     public LRPCBootstrap publish(List<ServiceConfig<?>> services) {
+        services.forEach(this::publish);
         return this;
     }
 
