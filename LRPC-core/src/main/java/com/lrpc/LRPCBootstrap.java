@@ -1,15 +1,13 @@
 package com.lrpc;
 
-import com.lrpc.common.Constant;
-import com.lrpc.common.utils.net.NetUtils;
-import com.lrpc.common.utils.zookeeper.ZookeeperNode;
 import com.lrpc.common.utils.zookeeper.ZookeeperUtil;
 import com.lrpc.conf.ProtocolConfig;
 import com.lrpc.conf.ReferenceConfig;
 import com.lrpc.conf.RegistryConfig;
 import com.lrpc.conf.ServiceConfig;
+import com.lrpc.discovery.Registry;
+import com.lrpc.discovery.impl.ZookeeperRegistry;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.ZooKeeper;
 
 import java.util.List;
@@ -25,9 +23,9 @@ public class LRPCBootstrap {
     private RegistryConfig registryConfig;
 
     private ProtocolConfig protocolConfig;
-
+    //注册中心
+    private Registry registry;
     private int port;
-    private ZooKeeper zooKeeper;
     /**
      * 此处使用饿汉式单例
      */
@@ -54,8 +52,8 @@ public class LRPCBootstrap {
      * @return
      */
     public LRPCBootstrap registry(RegistryConfig registry) {
-        this.registryConfig = registry;
-        zooKeeper = ZookeeperUtil.createZookeeper(registry.getUrl(), 1000);
+        //使用Registry获取一个注册中心
+        this.registry = registry.getRegistry();
         return this;
     }
 
@@ -79,29 +77,8 @@ public class LRPCBootstrap {
      * @param service
      * @return
      */
-    public LRPCBootstrap publish(ServiceConfig service) {
-        String parentPath = Constant.DEFAULT_PROVIDER_PATH + "/" + service.getInterfaceProvider().getName();
-        //持久节点
-        ZookeeperUtil.createZookeeperNode(
-                zooKeeper,
-                new ZookeeperNode(parentPath, null),
-                null,
-                CreateMode.PERSISTENT
-        );
-        //创建本机临时节点
-        String childNode = parentPath + "/" + NetUtils.getLocalIp() + ":" + port;
-        System.out.println("child :"+childNode);
-        String childName = ZookeeperUtil.createZookeeperNode(
-                zooKeeper,
-                new ZookeeperNode(childNode,null),
-                null,
-                CreateMode.EPHEMERAL
-                );
-        System.out.println(childName);
-        if (log.isDebugEnabled()) {
-            log.debug("service {} is be register", service.getInterfaceProvider().getName());
-        }
-
+    public LRPCBootstrap publish(ServiceConfig<?> service) {
+        registry.registry(service);
         return this;
     }
 
@@ -111,7 +88,7 @@ public class LRPCBootstrap {
      * @param services
      * @return
      */
-    public LRPCBootstrap publish(List<ServiceConfig> services) {
+    public LRPCBootstrap publish(List<ServiceConfig<?>> services) {
         return this;
     }
 

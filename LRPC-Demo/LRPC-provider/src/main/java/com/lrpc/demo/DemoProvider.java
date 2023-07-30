@@ -6,7 +6,7 @@ import com.lrpc.conf.RegistryConfig;
 import com.lrpc.conf.ServiceConfig;
 import com.lrpc.demo.impl.DemoApiHelloImpl;
 
-public class DemoProducer {
+public class DemoProvider {
     public static void main(String[] args) {
         ServiceConfig<DemoApiHello> server = new ServiceConfig<>();
         server.setInterfaceProvider(DemoApiHello.class);
@@ -14,7 +14,7 @@ public class DemoProducer {
 
         LRPCBootstrap.getInstance()
             .application("LRPC-provider")
-            .registry(new RegistryConfig("127.0.0.1:2181"))
+            .registry(new RegistryConfig("zookeeper://127.0.0.1:2181"))
             .protocol(new ProtocolConfig("jdk"))
             .port(8080)
             .publish(server)
