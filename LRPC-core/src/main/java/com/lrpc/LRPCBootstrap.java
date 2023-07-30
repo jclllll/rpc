@@ -1,6 +1,7 @@
 package com.lrpc;
 
 import com.lrpc.common.Constant;
+import com.lrpc.common.utils.net.NetUtils;
 import com.lrpc.common.utils.zookeeper.ZookeeperNode;
 import com.lrpc.common.utils.zookeeper.ZookeeperUtil;
 import com.lrpc.conf.ProtocolConfig;
@@ -12,6 +13,7 @@ import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.ZooKeeper;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class LRPCBootstrap {
@@ -81,13 +83,21 @@ public class LRPCBootstrap {
         String parentPath = Constant.DEFAULT_PROVIDER_PATH + "/" + service.getInterfaceProvider().getName();
         //持久节点
         ZookeeperUtil.createZookeeperNode(
-                zooKeeper
-                , new ZookeeperNode(parentPath, null)
-                , null
-                , CreateMode.PERSISTENT
+                zooKeeper,
+                new ZookeeperNode(parentPath, null),
+                null,
+                CreateMode.PERSISTENT
         );
         //创建本机临时节点
-
+        String childNode = parentPath + "/" + NetUtils.getLocalIp() + ":" + port;
+        System.out.println("child :"+childNode);
+        String childName = ZookeeperUtil.createZookeeperNode(
+                zooKeeper,
+                new ZookeeperNode(childNode,null),
+                null,
+                CreateMode.EPHEMERAL
+                );
+        System.out.println(childName);
         if (log.isDebugEnabled()) {
             log.debug("service {} is be register", service.getInterfaceProvider().getName());
         }
@@ -109,7 +119,11 @@ public class LRPCBootstrap {
      * 启动netty服务
      */
     public void start() {
-
+        try {
+            TimeUnit.SECONDS.sleep(10);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public LRPCBootstrap application(String name) {
