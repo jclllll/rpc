@@ -8,6 +8,8 @@ import com.lrpc.discovery.Registry;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -22,6 +24,7 @@ public class LRPCBootstrap {
     private ProtocolConfig protocolConfig;
     //注册中心
     private Registry registry;
+    private static final Map<String,ServiceConfig<?>> SERVICE_MAP=new ConcurrentHashMap<>(16);
     private int port;
     /**
      * 此处使用饿汉式单例
@@ -76,6 +79,7 @@ public class LRPCBootstrap {
      */
     public LRPCBootstrap publish(ServiceConfig<?> service) {
         registry.registry(service);
+        SERVICE_MAP.put(service.getInterfaceProvider().getName(),service);
         return this;
     }
 
