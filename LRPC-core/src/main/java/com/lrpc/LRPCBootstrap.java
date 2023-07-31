@@ -17,9 +17,8 @@ public class LRPCBootstrap {
     private LRPCBootstrap() {
     }
 
-    private String applicationName = "defaule";
+    private String applicationName = "default";
 
-    private RegistryConfig registryConfig;
 
     private ProtocolConfig protocolConfig;
     //注册中心
@@ -99,7 +98,7 @@ public class LRPCBootstrap {
      */
     public void start() {
         try {
-            TimeUnit.SECONDS.sleep(10);
+            TimeUnit.SECONDS.sleep(10000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -111,7 +110,7 @@ public class LRPCBootstrap {
     }
 
     public LRPCBootstrap reference(ReferenceConfig reference) {
-        reference.setRegistryConfig(registryConfig);
+        reference.setRegistry(registry);
         return this;
     }
 }

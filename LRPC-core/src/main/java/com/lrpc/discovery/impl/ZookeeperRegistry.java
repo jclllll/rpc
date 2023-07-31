@@ -1,6 +1,7 @@
 package com.lrpc.discovery.impl;
 
 import com.lrpc.common.Constant;
+import com.lrpc.common.exception.NetworkException;
 import com.lrpc.common.utils.net.NetUtils;
 import com.lrpc.common.utils.zookeeper.ZookeeperNode;
 import com.lrpc.common.utils.zookeeper.ZookeeperUtil;
@@ -12,6 +13,7 @@ import org.apache.zookeeper.ZooKeeper;
 
 import java.net.InetSocketAddress;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class ZookeeperRegistry extends AbstractRegistry {
@@ -51,6 +53,17 @@ public class ZookeeperRegistry extends AbstractRegistry {
         String serviceNode = Constant.DEFAULT_PROVIDER_PATH + "/" + serviceName;
 
         List<String> children = ZookeeperUtil.getChildren(zooKeeper, serviceNode, null);
-        return null;
+        //获取所有的可用的服务列表
+        List<InetSocketAddress> inetSocketAddresses = children.stream().map(ipString -> {
+            String[] ipAndPort = ipString.split(":");
+            String ip = ipAndPort[0];
+            int port = Integer.parseInt(ipAndPort[1]);
+            log.info("ip:{},port{}",ip,port);
+            return new InetSocketAddress(ip, port);
+        }).toList();
+        if(inetSocketAddresses.size()==0){
+            throw new NetworkException();
+        }
+        return inetSocketAddresses.get(0);
     }
 }
