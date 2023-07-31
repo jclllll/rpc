@@ -10,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.ZooKeeper;
 
+import java.net.InetSocketAddress;
+
 @Slf4j
 public class NacosRegistry extends AbstractRegistry {
     public NacosRegistry(String connectString,int timeout){
@@ -18,5 +20,10 @@ public class NacosRegistry extends AbstractRegistry {
     @Override
     public void registry(ServiceConfig<?> server) {
 
+    }
+
+    @Override
+    public InetSocketAddress lookup(String name) {
+        return null;
     }
 }

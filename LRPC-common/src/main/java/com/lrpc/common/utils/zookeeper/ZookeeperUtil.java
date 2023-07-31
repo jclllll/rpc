@@ -1,6 +1,7 @@
 package com.lrpc.common.utils.zookeeper;
 
 import com.lrpc.common.Constant;
+import com.lrpc.common.exception.DiscoveryException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.zookeeper.*;
@@ -55,6 +56,21 @@ public class ZookeeperUtil {
 		} catch (InterruptedException e) {
 			log.error("zookeeper : {} close fail , error mssage is {}",e.getMessage());
 			throw new RuntimeException("zookeeper close fail");
+		}
+	}
+
+	/**
+	 * 查询一个节点子元素
+	 * @param zooKeeper zk
+	 * @param serviceNode 服务节点
+	 * @return 子元素列表
+	 */
+	public static List<String> getChildren(ZooKeeper zooKeeper, String serviceNode,Watcher watcher) {
+		try {
+			return zooKeeper.getChildren(serviceNode, watcher);
+		} catch (KeeperException | InterruptedException e) {
+			log.error("get child fail {}",e.getMessage(),e);
+			throw new DiscoveryException(e);
 		}
 	}
 }

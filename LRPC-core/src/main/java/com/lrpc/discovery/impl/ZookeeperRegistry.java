@@ -9,6 +9,10 @@ import com.lrpc.discovery.AbstractRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.ZooKeeper;
+
+import java.net.InetSocketAddress;
+import java.util.List;
+
 @Slf4j
 public class ZookeeperRegistry extends AbstractRegistry {
     public ZookeeperRegistry(){zooKeeper = ZookeeperUtil.createZookeeper();}
@@ -40,5 +44,13 @@ public class ZookeeperRegistry extends AbstractRegistry {
         if (log.isDebugEnabled()) {
             log.debug("service {} is be register", service.getInterfaceProvider().getName());
         }
+    }
+
+    @Override
+    public InetSocketAddress lookup(String serviceName) {
+        String serviceNode = Constant.DEFAULT_PROVIDER_PATH + "/" + serviceName;
+
+        List<String> children = ZookeeperUtil.getChildren(zooKeeper, serviceNode, null);
+        return null;
     }
 }

@@ -111,7 +111,7 @@ public class LRPCBootstrap {
     }
 
     public LRPCBootstrap reference(ReferenceConfig reference) {
-
+        reference.setRegistryConfig(registryConfig);
         return this;
     }
 }
