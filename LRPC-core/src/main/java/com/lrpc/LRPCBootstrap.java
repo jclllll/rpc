@@ -5,6 +5,13 @@ import com.lrpc.conf.ReferenceConfig;
 import com.lrpc.conf.RegistryConfig;
 import com.lrpc.conf.ServiceConfig;
 import com.lrpc.discovery.Registry;
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -97,11 +104,18 @@ public class LRPCBootstrap {
      * 启动netty服务
      */
     public void start() {
-        try {
-            TimeUnit.SECONDS.sleep(10000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        ServerBootstrap serverBootstrap=new ServerBootstrap();
+        EventLoopGroup boss=new NioEventLoopGroup();
+        EventLoopGroup worker=new NioEventLoopGroup();
+
+        serverBootstrap.group(boss,worker)
+            .channel(NioServerSocketChannel.class)
+            .childHandler(new ChannelInitializer<SocketChannel>() {
+                @Override
+                protected void initChannel(SocketChannel socketChannel) throws Exception {
+                    socketChannel.pipeline().addLast(null);
+                }
+            });
     }
 
     public LRPCBootstrap application(String name) {
