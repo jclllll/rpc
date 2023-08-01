@@ -6,7 +6,8 @@ import com.lrpc.conf.RegistryConfig;
 import com.lrpc.conf.ServiceConfig;
 import com.lrpc.discovery.Registry;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -14,10 +15,10 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import lombok.extern.slf4j.Slf4j;
 
+import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class LRPCBootstrap {
@@ -30,7 +31,8 @@ public class LRPCBootstrap {
     private ProtocolConfig protocolConfig;
     //注册中心
     private Registry registry;
-    private static final Map<String,ServiceConfig<?>> SERVICE_MAP=new ConcurrentHashMap<>(16);
+    private final Map<String,ServiceConfig<?>> SERVICE_MAP=new ConcurrentHashMap<>(16);
+    public final Map<InetSocketAddress, Channel>CHANNEL_MAP=new ConcurrentHashMap<>(16);
     private int port;
     /**
      * 此处使用饿汉式单例
