@@ -1,5 +1,6 @@
 package com.lrpc.discovery.impl;
 
+import com.lrpc.LRPCBootstrap;
 import com.lrpc.common.Constant;
 import com.lrpc.common.exception.NetworkException;
 import com.lrpc.common.utils.net.NetUtils;
@@ -7,6 +8,7 @@ import com.lrpc.common.utils.zookeeper.ZookeeperNode;
 import com.lrpc.common.utils.zookeeper.ZookeeperUtil;
 import com.lrpc.conf.ServiceConfig;
 import com.lrpc.discovery.AbstractRegistry;
+import io.netty.bootstrap.Bootstrap;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.ZooKeeper;
@@ -19,7 +21,6 @@ import java.util.stream.Collectors;
 public class ZookeeperRegistry extends AbstractRegistry {
     public ZookeeperRegistry(){zooKeeper = ZookeeperUtil.createZookeeper();}
     private ZooKeeper zooKeeper;
-
     public ZookeeperRegistry(String connectString,int timeout) {
         this.zooKeeper = ZookeeperUtil.createZookeeper(connectString,timeout);
     }
@@ -35,7 +36,7 @@ public class ZookeeperRegistry extends AbstractRegistry {
             CreateMode.PERSISTENT
         );
         //创建本机临时节点
-        String childNode = parentPath + "/" + NetUtils.getLocalIp() + ":" + 8080;
+        String childNode = parentPath + "/" + NetUtils.getLocalIp() + ":" + LRPCBootstrap.getInstance().getPort();
         String childName = ZookeeperUtil.createZookeeperNode(
             zooKeeper,
             new ZookeeperNode(childNode,null),

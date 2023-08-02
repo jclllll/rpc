@@ -52,8 +52,6 @@ public class ReferenceConfig<T> {
         Class[] classes = new Class[]{interfaceConsumer};
         //动态代理生成代理对象
         Object o = Proxy.newProxyInstance(classLoader, classes, (proxy, method, args) -> {
-            log.info("method is {}", method);
-            log.info("args is {}", args);
             //1、发现服务，从注册中心寻找可用的服务
             InetSocketAddress address = registry.lookup(interfaceConsumer.getName());
             log.info("discovery service {}", address);
@@ -67,7 +65,6 @@ public class ReferenceConfig<T> {
                                 System.out.println(promise.isSuccess());
                                 log.info("connect {} is success",address);
                                 completableFuture.complete(promise.channel());
-                                System.out.println("promise是"+promise.channel());
                             } else if (!promise.isSuccess()) {
                                 completableFuture.completeExceptionally(promise.cause());
                             }
@@ -85,7 +82,6 @@ public class ReferenceConfig<T> {
                 if (!promise.isSuccess()) {
                     completableFuture.completeExceptionally(promise.cause());
                 }
-                System.out.println("发送成功");
             });
             return null;
         });

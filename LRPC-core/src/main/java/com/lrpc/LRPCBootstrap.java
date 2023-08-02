@@ -53,6 +53,9 @@ public class LRPCBootstrap {
         this.port = port;
         return this;
     }
+    public int getPort(){
+        return port;
+    }
 
     /**
      * 注册服务
@@ -120,7 +123,7 @@ public class LRPCBootstrap {
                             channelHandlerContext.writeAndFlush(Unpooled.copiedBuffer(byteBuf));
                         }
                     })
-        .bind(8080).sync();
+        .bind(port).sync();
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }

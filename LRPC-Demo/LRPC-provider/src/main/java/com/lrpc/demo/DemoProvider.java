@@ -14,9 +14,10 @@ public class DemoProvider {
 
         LRPCBootstrap.getInstance()
             .application("LRPC-provider")
+            .port(8081)
             .registry(new RegistryConfig("zookeeper://127.0.0.1:2181"))
             .protocol(new ProtocolConfig("jdk"))
-            .port(8080)
+
             .publish(server)
             .start();
     }
