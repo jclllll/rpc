@@ -5,6 +5,8 @@ import com.lrpc.common.exception.NetworkException;
 import com.lrpc.discovery.NettyBootstrapInit;
 import com.lrpc.discovery.Registry;
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
@@ -15,6 +17,8 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -53,21 +57,17 @@ public class ReferenceConfig<T> {
             //1、发现服务，从注册中心寻找可用的服务
             InetSocketAddress address = registry.lookup(interfaceConsumer.getName());
             log.info("discovery service {}", address);
-            //2、使用netty连接服务器发送调用的服务的名字+方法名字+参数列表
-            //判断缓存有无
             Channel channel = LRPCBootstrap.getInstance().CHANNEL_MAP.get(address);
             if (channel == null) {
-                //缓存没有
-                //同步
-                //channel = NettyBootstrapInit.getBootstrap
-                //  .connect(address).await().channel();
                 CompletableFuture<Channel> completableFuture = new CompletableFuture<>();
                 NettyBootstrapInit.getBootstrap()
                     .connect(address).addListener(
                         (ChannelFutureListener) promise -> {
-                            if (promise.isDone()) {
-                                log.info("connect {} is success", address);
+                            if (promise.isSuccess()) {
+                                System.out.println(promise.isSuccess());
+                                log.info("connect {} is success",address);
                                 completableFuture.complete(promise.channel());
+                                System.out.println("promise是"+promise.channel());
                             } else if (!promise.isSuccess()) {
                                 completableFuture.completeExceptionally(promise.cause());
                             }
@@ -80,27 +80,14 @@ public class ReferenceConfig<T> {
                 log.error("can not get channel error");
                 throw new NetworkException("can ");
             }
-            //同步策略
-//            ChannelFuture channelFuture = channel.writeAndFlush(new Object());
-//            if (channelFuture.isDone()) {
-//                Object object=channelFuture.getNow();
-//            } else if (!channelFuture.isSuccess()) {
-//                //捕获异步任务的异常
-//                Throwable cause = channelFuture.cause();
-//                throw new RuntimeException(cause);
-//            }
-
-            //异步策略
-            CompletableFuture<Object> completableFuture=new CompletableFuture<>();
-            channel.writeAndFlush(new Object()).addListener((ChannelFutureListener) promise -> {
-                if(promise.isDone()){
-                    completableFuture.complete(promise.getNow());
-                }else if(!promise.isSuccess()){
+            CompletableFuture<Object> completableFuture = new CompletableFuture<>();
+            channel.writeAndFlush(Unpooled.copiedBuffer(Arrays.toString(args).getBytes(StandardCharsets.UTF_8))).addListener((ChannelFutureListener) promise -> {
+                if (!promise.isSuccess()) {
                     completableFuture.completeExceptionally(promise.cause());
                 }
+                System.out.println("发送成功");
             });
-
-            return completableFuture.get(3,TimeUnit.SECONDS);
+            return null;
         });
         return (T) o;
     }

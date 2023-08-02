@@ -6,19 +6,20 @@ import com.lrpc.conf.RegistryConfig;
 import com.lrpc.conf.ServiceConfig;
 import com.lrpc.discovery.Registry;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.EventLoopGroup;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class LRPCBootstrap {
@@ -107,17 +108,29 @@ public class LRPCBootstrap {
      */
     public void start() {
         ServerBootstrap serverBootstrap=new ServerBootstrap();
-        EventLoopGroup boss=new NioEventLoopGroup();
-        EventLoopGroup worker=new NioEventLoopGroup();
+        EventLoopGroup boss=new NioEventLoopGroup(2);
+        EventLoopGroup worker=new NioEventLoopGroup(10);
+        try {
+            serverBootstrap.group(boss, worker)
+                    .channel(NioServerSocketChannel.class)
+                    .childHandler(new SimpleChannelInboundHandler<ByteBuf>() {
+                        @Override
+                        protected void channelRead0(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf) throws Exception {
+                            log.info("服务端收到信息：{}",byteBuf);
+                            channelHandlerContext.writeAndFlush(Unpooled.copiedBuffer(byteBuf));
+                        }
+                    })
+        .bind(8080).sync();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            TimeUnit.SECONDS.sleep(10000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 
-        serverBootstrap.group(boss,worker)
-            .channel(NioServerSocketChannel.class)
-            .childHandler(new ChannelInitializer<SocketChannel>() {
-                @Override
-                protected void initChannel(SocketChannel socketChannel) throws Exception {
-                    socketChannel.pipeline().addLast(null);
-                }
-            });
+        serverBootstrap.bind(8080);
     }
 
     public LRPCBootstrap application(String name) {
