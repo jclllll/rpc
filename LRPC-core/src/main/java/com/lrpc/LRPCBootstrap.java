@@ -18,6 +18,7 @@ import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -32,8 +33,9 @@ public class LRPCBootstrap {
     private ProtocolConfig protocolConfig;
     //注册中心
     private Registry registry;
-    private final Map<String,ServiceConfig<?>> SERVICE_MAP=new ConcurrentHashMap<>(16);
-    public final Map<InetSocketAddress, Channel>CHANNEL_MAP=new ConcurrentHashMap<>(16);
+    private final Map<String, ServiceConfig<?>> SERVICE_MAP = new ConcurrentHashMap<>(16);
+    public final Map<InetSocketAddress, Channel> CHANNEL_MAP = new ConcurrentHashMap<>(16);
+    public final Map<Long, CompletableFuture<Object>> PENDING_REQUEST = new ConcurrentHashMap<>(128);
     private int port;
     /**
      * 此处使用饿汉式单例
@@ -53,7 +55,8 @@ public class LRPCBootstrap {
         this.port = port;
         return this;
     }
-    public int getPort(){
+
+    public int getPort() {
         return port;
     }
 
@@ -91,7 +94,7 @@ public class LRPCBootstrap {
      */
     public LRPCBootstrap publish(ServiceConfig<?> service) {
         registry.registry(service);
-        SERVICE_MAP.put(service.getInterfaceProvider().getName(),service);
+        SERVICE_MAP.put(service.getInterfaceProvider().getName(), service);
         return this;
     }
 
@@ -110,20 +113,20 @@ public class LRPCBootstrap {
      * 启动netty服务
      */
     public void start() {
-        ServerBootstrap serverBootstrap=new ServerBootstrap();
-        EventLoopGroup boss=new NioEventLoopGroup(2);
-        EventLoopGroup worker=new NioEventLoopGroup(10);
+        ServerBootstrap serverBootstrap = new ServerBootstrap();
+        EventLoopGroup boss = new NioEventLoopGroup(2);
+        EventLoopGroup worker = new NioEventLoopGroup(10);
         try {
             serverBootstrap.group(boss, worker)
-                    .channel(NioServerSocketChannel.class)
-                    .childHandler(new SimpleChannelInboundHandler<ByteBuf>() {
-                        @Override
-                        protected void channelRead0(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf) throws Exception {
-                            log.info("服务端收到信息：{}",byteBuf);
-                            channelHandlerContext.writeAndFlush(Unpooled.copiedBuffer(byteBuf));
-                        }
-                    })
-        .bind(port).sync();
+                .channel(NioServerSocketChannel.class)
+                .childHandler(new SimpleChannelInboundHandler<ByteBuf>() {
+                    @Override
+                    protected void channelRead0(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf) throws Exception {
+                        log.info("服务端收到信息：{}", byteBuf);
+                        channelHandlerContext.writeAndFlush(Unpooled.copiedBuffer(byteBuf));
+                    }
+                })
+                .bind(port).sync();
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -132,8 +135,6 @@ public class LRPCBootstrap {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-
-        serverBootstrap.bind(8080);
     }
 
     public LRPCBootstrap application(String name) {

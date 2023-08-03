@@ -62,8 +62,7 @@ public class ReferenceConfig<T> {
                     .connect(address).addListener(
                         (ChannelFutureListener) promise -> {
                             if (promise.isSuccess()) {
-                                System.out.println(promise.isSuccess());
-                                log.info("connect {} is success",address);
+                                log.info("connect {} is success", address);
                                 completableFuture.complete(promise.channel());
                             } else if (!promise.isSuccess()) {
                                 completableFuture.completeExceptionally(promise.cause());
@@ -78,12 +77,13 @@ public class ReferenceConfig<T> {
                 throw new NetworkException("can ");
             }
             CompletableFuture<Object> completableFuture = new CompletableFuture<>();
+            LRPCBootstrap.getInstance().PENDING_REQUEST.put(1L, completableFuture);
             channel.writeAndFlush(Unpooled.copiedBuffer(Arrays.toString(args).getBytes(StandardCharsets.UTF_8))).addListener((ChannelFutureListener) promise -> {
                 if (!promise.isSuccess()) {
                     completableFuture.completeExceptionally(promise.cause());
                 }
             });
-            return null;
+            return completableFuture.get(3, TimeUnit.SECONDS);
         });
         return (T) o;
     }

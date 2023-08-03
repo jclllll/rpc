@@ -16,7 +16,8 @@ public class DemoClient {
 			.reference(reference);
 
 		DemoApiHello demoApiHello = reference.get();
-		demoApiHello.sayHello("hhhhhhhh");
+		String result = demoApiHello.sayHello("hhhhhhhh");
+		System.out.println("返回值："+result);
 
 	}
 }
