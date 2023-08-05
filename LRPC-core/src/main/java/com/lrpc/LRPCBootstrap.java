@@ -5,6 +5,7 @@ import com.lrpc.conf.ReferenceConfig;
 import com.lrpc.conf.RegistryConfig;
 import com.lrpc.conf.ServiceConfig;
 import com.lrpc.discovery.Registry;
+import com.lrpc.handler.ServerSimpleChannelInboundHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -117,13 +118,7 @@ public class LRPCBootstrap {
         try {
             serverBootstrap.group(boss, worker)
                 .channel(NioServerSocketChannel.class)
-                .childHandler(new SimpleChannelInboundHandler<ByteBuf>() {
-                    @Override
-                    protected void channelRead0(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf) throws Exception {
-                        log.info("服务端收到信息：{}", byteBuf);
-                        channelHandlerContext.writeAndFlush(Unpooled.copiedBuffer(byteBuf));
-                    }
-                })
+                .childHandler(new ServerSimpleChannelInboundHandler())
                 .bind(port).sync();
         } catch (InterruptedException e) {
             throw new RuntimeException(e);

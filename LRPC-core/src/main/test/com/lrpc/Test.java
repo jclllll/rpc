@@ -1,7 +1,6 @@
 package com.lrpc;
 
 import com.lrpc.transport.message.LRPCRequest;
-
 public class Test {
     @org.junit.Test
     public void LRPCCMSSettingTest() {

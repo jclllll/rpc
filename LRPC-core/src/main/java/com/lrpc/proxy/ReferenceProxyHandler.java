@@ -6,7 +6,6 @@ import com.lrpc.discovery.NettyBootstrapInit;
 import com.lrpc.discovery.Registry;
 import com.lrpc.transport.message.LRPCRequest;
 import com.lrpc.transport.message.RequestPayload;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import lombok.extern.slf4j.Slf4j;
@@ -14,8 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -40,7 +37,7 @@ public class ReferenceProxyHandler implements InvocationHandler {
             .interfaceName(interfaceConsumer.getName())
             .functionName(method.getName())
             .paramsType(method.getParameterTypes())
-            .params(method.getParameters())
+            .params(args)
             .returnType(method.getReturnType())
             .build();
         LRPCRequest request = LRPCRequest.builder()
@@ -57,6 +54,8 @@ public class ReferenceProxyHandler implements InvocationHandler {
         channel.writeAndFlush(request).addListener((ChannelFutureListener) promise -> {
             if (!promise.isSuccess()) {
                 completableFuture.completeExceptionally(promise.cause());
+            }else {
+                completableFuture.complete(promise.get());
             }
         });
         return completableFuture.get(3, TimeUnit.SECONDS);
