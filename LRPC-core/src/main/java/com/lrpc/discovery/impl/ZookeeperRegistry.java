@@ -8,25 +8,27 @@ import com.lrpc.common.utils.zookeeper.ZookeeperNode;
 import com.lrpc.common.utils.zookeeper.ZookeeperUtil;
 import com.lrpc.conf.ServiceConfig;
 import com.lrpc.discovery.AbstractRegistry;
-import io.netty.bootstrap.Bootstrap;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.ZooKeeper;
 
 import java.net.InetSocketAddress;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 public class ZookeeperRegistry extends AbstractRegistry {
-    public ZookeeperRegistry(){zooKeeper = ZookeeperUtil.createZookeeper();}
+    public ZookeeperRegistry() {
+        zooKeeper = ZookeeperUtil.createZookeeper();
+    }
+
     private ZooKeeper zooKeeper;
-    public ZookeeperRegistry(String connectString,int timeout) {
-        this.zooKeeper = ZookeeperUtil.createZookeeper(connectString,timeout);
+
+    public ZookeeperRegistry(String connectString, int timeout) {
+        this.zooKeeper = ZookeeperUtil.createZookeeper(connectString, timeout);
     }
 
     @Override
-    public void registry(ServiceConfig<?>service) {
+    public void registry(ServiceConfig<?> service) {
         String parentPath = Constant.DEFAULT_PROVIDER_PATH + "/" + service.getInterfaceProvider().getName();
         //持久节点
         ZookeeperUtil.createZookeeperNode(
@@ -39,11 +41,11 @@ public class ZookeeperRegistry extends AbstractRegistry {
         String childNode = parentPath + "/" + NetUtils.getLocalIp() + ":" + LRPCBootstrap.getInstance().getPort();
         String childName = ZookeeperUtil.createZookeeperNode(
             zooKeeper,
-            new ZookeeperNode(childNode,null),
+            new ZookeeperNode(childNode, null),
             null,
             CreateMode.EPHEMERAL
         );
-        log.info("child create {}",childName);
+        log.info("child create {}", childName);
         if (log.isDebugEnabled()) {
             log.debug("service {} is be register", service.getInterfaceProvider().getName());
         }
@@ -59,10 +61,10 @@ public class ZookeeperRegistry extends AbstractRegistry {
             String[] ipAndPort = ipString.split(":");
             String ip = ipAndPort[0];
             int port = Integer.parseInt(ipAndPort[1]);
-            log.info("ip:{},port{}",ip,port);
+            log.info("ip:{},port{}", ip, port);
             return new InetSocketAddress(ip, port);
         }).toList();
-        if(inetSocketAddresses.size()==0){
+        if (inetSocketAddresses.size() == 0) {
             throw new NetworkException();
         }
         return inetSocketAddresses.get(0);

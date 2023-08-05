@@ -43,7 +43,8 @@ public class ReferenceProxyHandler implements InvocationHandler {
         });
         return completableFuture.get(3, TimeUnit.SECONDS);
     }
-    private Channel getChannelFromCache(InetSocketAddress address){
+
+    private Channel getChannelFromCache(InetSocketAddress address) {
         Channel channel = LRPCBootstrap.getInstance().CHANNEL_MAP.get(address);
         if (channel == null) {
             CompletableFuture<Channel> completableFuture = new CompletableFuture<>();
@@ -66,7 +67,7 @@ public class ReferenceProxyHandler implements InvocationHandler {
             LRPCBootstrap.getInstance().CHANNEL_MAP.put(address, channel);
         }
         if (channel == null) {
-            log.error("can not get channel error:{}",address);
+            log.error("can not get channel error:{}", address);
             throw new NetworkException();
         }
         return channel;

@@ -25,8 +25,8 @@ public class RegistryConfig {
         //获取注册中心类型
         if (type.equals("zookeeper")) {
             return new ZookeeperRegistry(host, Constant.TIME_OUT);
-        }else if (type.equals("nacos")){
-            return new NacosRegistry(host,Constant.TIME_OUT);
+        } else if (type.equals("nacos")) {
+            return new NacosRegistry(host, Constant.TIME_OUT);
         }
         throw new DiscoveryException("not found dicovery");
     }
