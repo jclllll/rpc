@@ -4,6 +4,7 @@ import com.lrpc.LRPCBootstrap;
 import com.lrpc.common.exception.NetworkException;
 import com.lrpc.discovery.NettyBootstrapInit;
 import com.lrpc.discovery.Registry;
+import com.lrpc.proxy.ReferenceProxyHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -49,42 +50,9 @@ public class ReferenceConfig<T> {
      */
     public T get() {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        Class[] classes = new Class[]{interfaceConsumer};
+        ReferenceProxyHandler proxy=new ReferenceProxyHandler(registry,interfaceConsumer);
         //动态代理生成代理对象
-        Object o = Proxy.newProxyInstance(classLoader, classes, (proxy, method, args) -> {
-            //1、发现服务，从注册中心寻找可用的服务
-            InetSocketAddress address = registry.lookup(interfaceConsumer.getName());
-            log.info("discovery service {}", address);
-            Channel channel = LRPCBootstrap.getInstance().CHANNEL_MAP.get(address);
-            if (channel == null) {
-                CompletableFuture<Channel> completableFuture = new CompletableFuture<>();
-                NettyBootstrapInit.getBootstrap()
-                    .connect(address).addListener(
-                        (ChannelFutureListener) promise -> {
-                            if (promise.isSuccess()) {
-                                log.info("connect {} is success", address);
-                                completableFuture.complete(promise.channel());
-                            } else if (!promise.isSuccess()) {
-                                completableFuture.completeExceptionally(promise.cause());
-                            }
-                        });
-                //阻塞获取
-                channel = completableFuture.get(3, TimeUnit.SECONDS);
-                LRPCBootstrap.getInstance().CHANNEL_MAP.put(address, channel);
-            }
-            if (channel == null) {
-                log.error("can not get channel error");
-                throw new NetworkException("can ");
-            }
-            CompletableFuture<Object> completableFuture = new CompletableFuture<>();
-            LRPCBootstrap.getInstance().PENDING_REQUEST.put(1L, completableFuture);
-            channel.writeAndFlush(Unpooled.copiedBuffer(Arrays.toString(args).getBytes(StandardCharsets.UTF_8))).addListener((ChannelFutureListener) promise -> {
-                if (!promise.isSuccess()) {
-                    completableFuture.completeExceptionally(promise.cause());
-                }
-            });
-            return completableFuture.get(3, TimeUnit.SECONDS);
-        });
+        Object o = Proxy.newProxyInstance(classLoader, new Class[]{interfaceConsumer},proxy );
         return (T) o;
     }
 
