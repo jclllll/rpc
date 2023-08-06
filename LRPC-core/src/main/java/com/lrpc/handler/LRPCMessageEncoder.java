@@ -21,7 +21,7 @@ public class LRPCMessageEncoder extends MessageToByteEncoder<LRPCRequest> {
         byteBuf.writeBytes("ac765c9b".getBytes(StandardCharsets.UTF_8));
         //version
         byteBuf.writeByte(MessageFormatConstant.VERSION);
-        byteBuf.writeByte(MessageFormatConstant.HEADER_LENGTH);
+        byteBuf.writeShort(MessageFormatConstant.HEADER_LENGTH);
         //总长度,先空着
         byteBuf.writerIndex(byteBuf.writerIndex() + 4);
         byteBuf.writeByte(lrpcRequest.getCompressSerializeMsgType());
