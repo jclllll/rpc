@@ -22,10 +22,18 @@ public class LRPCMessageEncoder extends MessageToByteEncoder<LRPCRequest> {
         byteBuf.writerIndex(byteBuf.writerIndex() + 4);
         byteBuf.writeByte(lrpcRequest.getCompressSerializeMsgType());
         byteBuf.writeLong(lrpcRequest.getRequestId());
+        //判断是否为心跳
+        if ((lrpcRequest.getCompressSerializeMsgType() & 1) == 1) {
+            //魔术值+version+head_length
+            byteBuf.writerIndex(11);
+            byteBuf.writeInt(MessageFormatConstant.HEADER_LENGTH);
+            return;
+        }
         //头写完了，该写body了
         byte[] body = getPayloadBytes(lrpcRequest.getPayload());
         //先把总长度写上
         int writerIndex = byteBuf.writerIndex();
+        //魔术值+version+head_length
         byteBuf.writerIndex(11);
         byteBuf.writeInt(MessageFormatConstant.HEADER_LENGTH + body.length);
         byteBuf.writerIndex(writerIndex);
