@@ -5,13 +5,14 @@ import com.lrpc.conf.ReferenceConfig;
 import com.lrpc.conf.RegistryConfig;
 import com.lrpc.conf.ServiceConfig;
 import com.lrpc.discovery.Registry;
-import com.lrpc.handler.ServerSimpleChannelInboundHandler;
+import com.lrpc.transport.message.LRPCMessageDecoder;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetSocketAddress;
@@ -118,7 +119,13 @@ public class LRPCBootstrap {
         try {
             serverBootstrap.group(boss, worker)
                 .channel(NioServerSocketChannel.class)
-                .childHandler(new ServerSimpleChannelInboundHandler())
+                .childHandler(new ChannelInitializer<SocketChannel>() {
+                    @Override
+                    protected void initChannel(SocketChannel socketChannel) throws Exception {
+                        socketChannel.pipeline()
+                            .addLast(new LRPCMessageDecoder());
+                    }
+                })
                 .bind(port).sync();
         } catch (InterruptedException e) {
             throw new RuntimeException(e);

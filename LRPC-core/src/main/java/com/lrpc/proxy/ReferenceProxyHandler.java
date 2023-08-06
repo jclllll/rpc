@@ -5,6 +5,7 @@ import com.lrpc.common.exception.NetworkException;
 import com.lrpc.discovery.NettyBootstrapInit;
 import com.lrpc.discovery.Registry;
 import com.lrpc.transport.message.LRPCRequest;
+import com.lrpc.transport.message.MessageFormatConstant;
 import com.lrpc.transport.message.RequestPayload;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
@@ -42,10 +43,11 @@ public class ReferenceProxyHandler implements InvocationHandler {
             .build();
         LRPCRequest request = LRPCRequest.builder()
             .requestId(1L)
+            .version(MessageFormatConstant.VERSION)
+            .magic(MessageFormatConstant.MAGIC)
             .compressSerializeMsgType(LRPCRequest.getCSMSetting(1, 1, 1))
             .payload(payload)
             .build();
-
         //从缓存中取得一个Channel
         Channel channel = getChannelFromCache(address);
         CompletableFuture<Object> completableFuture = new CompletableFuture<>();

@@ -1,5 +1,6 @@
 package com.lrpc.handler;
 
+import com.lrpc.transport.message.LRPCMessageEncoder;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.logging.LogLevel;
@@ -10,7 +11,6 @@ public class ChannelInitializerHandler extends ChannelInitializer<SocketChannel>
     protected void initChannel(SocketChannel socketChannel) throws Exception {
         socketChannel.pipeline()
             .addLast(new LoggingHandler(LogLevel.INFO))
-            .addLast(new LRPCMessageEncoder())
-            .addLast(new MySimpleChannelInBoundHandler());
+            .addLast(new LRPCMessageEncoder());
     }
 }

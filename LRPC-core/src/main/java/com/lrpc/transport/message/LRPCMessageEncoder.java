@@ -1,8 +1,5 @@
-package com.lrpc.handler;
+package com.lrpc.transport.message;
 
-import com.lrpc.transport.message.LRPCRequest;
-import com.lrpc.transport.message.MessageFormatConstant;
-import com.lrpc.transport.message.RequestPayload;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
@@ -11,16 +8,15 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.nio.charset.StandardCharsets;
 
 @Slf4j
 public class LRPCMessageEncoder extends MessageToByteEncoder<LRPCRequest> {
     @Override
     protected void encode(ChannelHandlerContext channelHandlerContext, LRPCRequest lrpcRequest, ByteBuf byteBuf) throws Exception {
         //ac765c9b魔术值
-        byteBuf.writeBytes("ac765c9b".getBytes(StandardCharsets.UTF_8));
+        byteBuf.writeBytes(lrpcRequest.getMagic());
         //version
-        byteBuf.writeByte(MessageFormatConstant.VERSION);
+        byteBuf.writeByte(lrpcRequest.getVersion());
         byteBuf.writeShort(MessageFormatConstant.HEADER_LENGTH);
         //总长度,先空着
         byteBuf.writerIndex(byteBuf.writerIndex() + 4);

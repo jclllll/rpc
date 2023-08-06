@@ -13,4 +13,6 @@ public class MessageFormatConstant {
 
     public final static int SHORT_LENGTH = 2;
     public final static int INT_LENGTH = 4;
+    public final static int LONG_LENGTH = 8;
+    public final static int BYTE_LENGTH = 1;
 }
