@@ -5,6 +5,8 @@ import com.lrpc.conf.ReferenceConfig;
 import com.lrpc.conf.RegistryConfig;
 import com.lrpc.conf.ServiceConfig;
 import com.lrpc.discovery.Registry;
+import com.lrpc.handler.ServerSimpleChannelInboundHandler;
+import com.lrpc.handler.ServiceInvokeHandler;
 import com.lrpc.transport.message.LRPCMessageDecoder;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
@@ -33,7 +35,7 @@ public class LRPCBootstrap {
     private ProtocolConfig protocolConfig;
     //注册中心
     private Registry registry;
-    private final Map<String, ServiceConfig<?>> SERVICE_MAP = new ConcurrentHashMap<>(16);
+    public final Map<String, ServiceConfig<?>> SERVICE_MAP = new ConcurrentHashMap<>(16);
     public final Map<InetSocketAddress, Channel> CHANNEL_MAP = new ConcurrentHashMap<>(16);
     public final Map<Long, CompletableFuture<Object>> PENDING_REQUEST = new ConcurrentHashMap<>(128);
     private int port;
@@ -123,7 +125,9 @@ public class LRPCBootstrap {
                     @Override
                     protected void initChannel(SocketChannel socketChannel) throws Exception {
                         socketChannel.pipeline()
-                            .addLast(new LRPCMessageDecoder());
+                            .addLast(new LoggingHandler(LogLevel.INFO))
+                            .addLast(new LRPCMessageDecoder())
+                            .addLast(new ServiceInvokeHandler());
                     }
                 })
                 .bind(port).sync();
