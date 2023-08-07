@@ -1,6 +1,6 @@
 # rpc
 
-LRPCRequest
+lrpcResponse
 1、服务调用方
     1、请求id
     2、压缩类型

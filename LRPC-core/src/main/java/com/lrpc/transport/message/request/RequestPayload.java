@@ -1,4 +1,4 @@
-package com.lrpc.transport.message;
+package com.lrpc.transport.message.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

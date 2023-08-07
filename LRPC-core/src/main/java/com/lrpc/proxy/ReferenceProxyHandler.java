@@ -4,9 +4,9 @@ import com.lrpc.LRPCBootstrap;
 import com.lrpc.common.exception.NetworkException;
 import com.lrpc.discovery.NettyBootstrapInit;
 import com.lrpc.discovery.Registry;
-import com.lrpc.transport.message.LRPCRequest;
+import com.lrpc.transport.message.request.LRPCRequest;
 import com.lrpc.transport.message.MessageFormatConstant;
-import com.lrpc.transport.message.RequestPayload;
+import com.lrpc.transport.message.request.RequestPayload;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import lombok.extern.slf4j.Slf4j;
@@ -56,8 +56,6 @@ public class ReferenceProxyHandler implements InvocationHandler {
         channel.writeAndFlush(request).addListener((ChannelFutureListener) promise -> {
             if (!promise.isSuccess()) {
                 completableFuture.completeExceptionally(promise.cause());
-            }else {
-                completableFuture.complete(promise.get());
             }
         });
         return completableFuture.get(3, TimeUnit.SECONDS);

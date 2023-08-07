@@ -1,19 +1,14 @@
-package com.lrpc.transport.message;
-
+package com.lrpc.transport.message.response;
 
 import com.lrpc.common.exception.RequestTypeException;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@Data
-@NoArgsConstructor
-@Builder
-@AllArgsConstructor
 @Slf4j
-public class LRPCRequest {
+@Data
+@Builder
+public class LRPCResponse {
     public static byte getCSMSetting(int compress, int serialize, int msgType) {
         if (compress > 7 || serialize > 7 || msgType > 3) {
             log.error("compress:{} serialize:{} msgType{}", compress, serialize, msgType);
@@ -29,6 +24,6 @@ public class LRPCRequest {
     private int version;
     private byte[] magic;
     //负载payLoad
-    private RequestPayload payload;
+    private ResponsePayload payload;
     //如果用户要自定义压缩方法和序列化方式
 }

@@ -1,5 +1,8 @@
-package com.lrpc.transport.message;
+package com.lrpc.transport.message.encoder;
 
+import com.lrpc.transport.message.request.LRPCRequest;
+import com.lrpc.transport.message.MessageFormatConstant;
+import com.lrpc.transport.message.request.RequestPayload;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
@@ -23,7 +26,7 @@ public class LRPCMessageEncoder extends MessageToByteEncoder<LRPCRequest> {
         byteBuf.writeByte(lrpcRequest.getCompressSerializeMsgType());
         byteBuf.writeLong(lrpcRequest.getRequestId());
         //判断是否为心跳
-        if ((lrpcRequest.getCompressSerializeMsgType() & 1) == 1) {
+        if ((lrpcRequest.getCompressSerializeMsgType() & 1) == 0) {
             //魔术值+version+head_length
             byteBuf.writerIndex(11);
             byteBuf.writeInt(MessageFormatConstant.HEADER_LENGTH);

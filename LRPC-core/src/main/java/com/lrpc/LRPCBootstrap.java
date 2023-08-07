@@ -7,7 +7,8 @@ import com.lrpc.conf.ServiceConfig;
 import com.lrpc.discovery.Registry;
 import com.lrpc.handler.ServerSimpleChannelInboundHandler;
 import com.lrpc.handler.ServiceInvokeHandler;
-import com.lrpc.transport.message.LRPCMessageDecoder;
+import com.lrpc.transport.message.decoder.LRPCMessageDecoder;
+import com.lrpc.transport.message.encoder.LRPCResponseEncoder;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -127,7 +128,8 @@ public class LRPCBootstrap {
                         socketChannel.pipeline()
                             .addLast(new LoggingHandler(LogLevel.INFO))
                             .addLast(new LRPCMessageDecoder())
-                            .addLast(new ServiceInvokeHandler());
+                            .addLast(new ServiceInvokeHandler())
+                            .addLast(new LRPCResponseEncoder());
                     }
                 })
                 .bind(port).sync();
