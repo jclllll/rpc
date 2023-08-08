@@ -5,7 +5,6 @@ import com.lrpc.conf.ReferenceConfig;
 import com.lrpc.conf.RegistryConfig;
 import com.lrpc.conf.ServiceConfig;
 import com.lrpc.discovery.Registry;
-import com.lrpc.handler.ServerSimpleChannelInboundHandler;
 import com.lrpc.handler.ServiceInvokeHandler;
 import com.lrpc.transport.message.decoder.LRPCMessageDecoder;
 import com.lrpc.transport.message.encoder.LRPCResponseEncoder;

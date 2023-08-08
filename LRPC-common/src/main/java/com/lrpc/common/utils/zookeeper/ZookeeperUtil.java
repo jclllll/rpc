@@ -7,7 +7,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.zookeeper.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
