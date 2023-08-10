@@ -1,10 +1,14 @@
 package com.lrpc.demo;
 
+import com.lrpc.IdGenerator;
 import com.lrpc.LRPCBootstrap;
 import com.lrpc.conf.ReferenceConfig;
 import com.lrpc.conf.RegistryConfig;
 
 public class DemoClient {
+	static{
+		IdGenerator.init(1,1);
+	}
 
 	public static void main(String[] args) {
 		ReferenceConfig<DemoApiHello> reference = new ReferenceConfig<>();

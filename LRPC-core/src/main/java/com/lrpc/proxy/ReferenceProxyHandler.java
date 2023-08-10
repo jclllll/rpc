@@ -1,5 +1,6 @@
 package com.lrpc.proxy;
 
+import com.lrpc.IdGenerator;
 import com.lrpc.LRPCBootstrap;
 import com.lrpc.common.exception.NetworkException;
 import com.lrpc.discovery.NettyBootstrapInit;
@@ -42,7 +43,7 @@ public class ReferenceProxyHandler implements InvocationHandler {
             .returnType(method.getReturnType())
             .build();
         LRPCRequest request = LRPCRequest.builder()
-            .requestId(1L)
+            .requestId(IdGenerator.getUid())
             .version(MessageFormatConstant.VERSION)
             .magic(MessageFormatConstant.MAGIC)
             .compressSerializeMsgType(LRPCRequest.getCSMSetting(1, 1, 1))

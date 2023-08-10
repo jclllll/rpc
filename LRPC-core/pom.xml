@@ -31,5 +31,10 @@
             <artifactId>LRPC-common</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>org.example</groupId>
+            <artifactId>LRPC-UidGenerator</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 </project>
