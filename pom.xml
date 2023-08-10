@@ -14,6 +14,7 @@
         <module>LRPC-core</module>
         <module>LRPC-manager</module>
         <module>LRPC-common</module>
+        <module>LRPC-UidGenerator</module>
     </modules>
 
     <properties>
