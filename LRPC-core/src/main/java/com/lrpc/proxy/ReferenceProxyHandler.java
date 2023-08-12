@@ -8,6 +8,8 @@ import com.lrpc.discovery.Registry;
 import com.lrpc.transport.message.request.LRPCRequest;
 import com.lrpc.transport.message.MessageFormatConstant;
 import com.lrpc.transport.message.request.RequestPayload;
+import com.lrpc.transport.message.serialize.impl.SerializeFactory;
+import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import lombok.extern.slf4j.Slf4j;
@@ -46,7 +48,7 @@ public class ReferenceProxyHandler implements InvocationHandler {
             .requestId(IdGenerator.getUid())
             .version(MessageFormatConstant.VERSION)
             .magic(MessageFormatConstant.MAGIC)
-            .compressSerializeMsgType(LRPCRequest.getCSMSetting(1, 1, 1))
+            .compressSerializeMsgType(LRPCRequest.getCSMSetting(1, LRPCBootstrap.SERIALIZE, 1))
             .payload(payload)
             .build();
         //从缓存中取得一个Channel

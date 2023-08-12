@@ -3,6 +3,7 @@ package com.lrpc.transport.message.decoder;
 import com.lrpc.transport.message.request.LRPCRequest;
 import com.lrpc.transport.message.MessageFormatConstant;
 import com.lrpc.transport.message.request.RequestPayload;
+import com.lrpc.transport.message.serialize.impl.SerializeFactory;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
@@ -21,7 +22,7 @@ public class LRPCMessageDecoder extends LengthFieldBasedFrameDecoder {
             //长度字段的长度
             MessageFormatConstant.INT_LENGTH,
             //负载的适配长度
-            -(MessageFormatConstant.HEADER_LENGTH-MessageFormatConstant.BYTE_LENGTH-MessageFormatConstant.LONG_LENGTH),
+            -(MessageFormatConstant.HEADER_LENGTH - MessageFormatConstant.BYTE_LENGTH - MessageFormatConstant.LONG_LENGTH),
             0);
     }
 
@@ -70,18 +71,7 @@ public class LRPCMessageDecoder extends LengthFieldBasedFrameDecoder {
 
         }
         //反序列化
-        RequestPayload payload = null;
-        if (serialize == 1) {
-            ByteArrayInputStream bais = new ByteArrayInputStream(bodyByte);
-            ObjectInputStream ois = null;
-            try {
-                ois = new ObjectInputStream(bais);
-                payload = (RequestPayload) ois.readObject();
-            } catch (IOException | ClassNotFoundException e) {
-                log.error("payload无法序列化");
-                throw new RuntimeException(e);
-            }
-        }
+        RequestPayload payload = SerializeFactory.getSerialize((int) serialize).deSerialize(bodyByte);
         builder.compressSerializeMsgType(compressSerializeMsg);
         builder.payload(payload);
         return builder.build();

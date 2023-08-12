@@ -8,6 +8,7 @@ import com.lrpc.discovery.Registry;
 import com.lrpc.handler.ServiceInvokeHandler;
 import com.lrpc.transport.message.decoder.LRPCMessageDecoder;
 import com.lrpc.transport.message.encoder.LRPCResponseEncoder;
+import com.lrpc.transport.message.serialize.impl.SerializeFactory;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -38,6 +39,8 @@ public class LRPCBootstrap {
     public final Map<String, ServiceConfig<?>> SERVICE_MAP = new ConcurrentHashMap<>(16);
     public final Map<InetSocketAddress, Channel> CHANNEL_MAP = new ConcurrentHashMap<>(16);
     public final Map<Long, CompletableFuture<Object>> PENDING_REQUEST = new ConcurrentHashMap<>(128);
+
+    public static Integer SERIALIZE = 0;
     private int port;
     /**
      * 此处使用饿汉式单例
@@ -149,6 +152,15 @@ public class LRPCBootstrap {
 
     public LRPCBootstrap reference(ReferenceConfig reference) {
         reference.setRegistry(registry);
+        return this;
+    }
+    public LRPCBootstrap serialize(String type){
+        Integer num = SerializeFactory.CACHE_NUM.get(type);
+        if(num==null){
+            log.error("序列化方式不支持:{}",type);
+            throw new RuntimeException("序列化方式不支持");
+        }
+        SERIALIZE = num;
         return this;
     }
 }

@@ -17,6 +17,7 @@ public class DemoClient {
 		LRPCBootstrap.getInstance()
 			.application("LRPC-consumer")
 			.registry(new RegistryConfig("zookeeper://127.0.0.1:2181"))
+			.serialize("jdk")
 			.reference(reference);
 
 		DemoApiHello demoApiHello = reference.get();

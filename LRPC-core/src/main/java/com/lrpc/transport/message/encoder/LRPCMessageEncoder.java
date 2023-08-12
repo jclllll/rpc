@@ -3,6 +3,7 @@ package com.lrpc.transport.message.encoder;
 import com.lrpc.transport.message.request.LRPCRequest;
 import com.lrpc.transport.message.MessageFormatConstant;
 import com.lrpc.transport.message.request.RequestPayload;
+import com.lrpc.transport.message.serialize.impl.SerializeFactory;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
@@ -33,7 +34,9 @@ public class LRPCMessageEncoder extends MessageToByteEncoder<LRPCRequest> {
             return;
         }
         //头写完了，该写body了
-        byte[] body = getPayloadBytes(lrpcRequest.getPayload());
+        byte[] body = SerializeFactory.getSerialize(
+                (lrpcRequest.getCompressSerializeMsgType() >> 2) & 0b111)
+            .serialize(lrpcRequest.getPayload());
         //先把总长度写上
         int writerIndex = byteBuf.writerIndex();
         //魔术值+version+head_length
