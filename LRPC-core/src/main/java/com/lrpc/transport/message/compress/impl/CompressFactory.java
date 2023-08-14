@@ -23,7 +23,7 @@ final public class CompressFactory {
         CACHE_NUM.put("****", 2);
     }
 
-    public static Compress getSerialize(Integer num) {
+    public static Compress getCompress(Integer num) {
         if (num == null) {
             log.error("压缩方式不被支持");
             throw new SerializeException("压缩方式不支持");

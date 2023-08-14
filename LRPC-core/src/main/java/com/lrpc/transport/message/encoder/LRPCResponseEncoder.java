@@ -1,5 +1,6 @@
 package com.lrpc.transport.message.encoder;
 
+import com.lrpc.transport.message.compress.impl.CompressFactory;
 import com.lrpc.transport.message.response.LRPCResponse;
 import com.lrpc.transport.message.MessageFormatConstant;
 import com.lrpc.transport.message.response.ResponsePayload;
@@ -37,6 +38,10 @@ public class LRPCResponseEncoder extends MessageToByteEncoder<LRPCResponse> {
         byte[] body = SerializeFactory.getSerialize(
                 (lrpcResponse.getCompressSerializeMsgType() >> 2) & 0b111)
             .serialize(lrpcResponse.getPayload());
+        //序列化之后压缩
+        body = CompressFactory.getCompress(
+                lrpcResponse.getCompressSerializeMsgType() >> 5)
+            .compress(body);
         //先把总长度写上
         int writerIndex = byteBuf.writerIndex();
         //魔术值+version+head_length

@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
 @Slf4j
 public class ServiceInvokeHandler extends SimpleChannelInboundHandler<LRPCRequest> {
     @Override
@@ -24,11 +25,11 @@ public class ServiceInvokeHandler extends SimpleChannelInboundHandler<LRPCReques
         try {
             Object returnValue = invoke(payload);
             builder.payload(returnValue);
-            builder.code((byte)0);
-        }catch (Exception e){
-            builder.code((byte)1);
+            builder.code((byte) 0);
+        } catch (Exception e) {
+            builder.code((byte) 1);
             builder.msg(e.getMessage());
-            log.error("{} invoke error:{}",payload,e.getMessage());
+            log.error("{} invoke error:{}", payload, e.getMessage());
         }
         //封装响应
         LRPCResponse.LRPCResponseBuilder LRPCResponseBuilder = LRPCResponse.builder();
@@ -36,12 +37,13 @@ public class ServiceInvokeHandler extends SimpleChannelInboundHandler<LRPCReques
         LRPCResponseBuilder.compressSerializeMsgType(lrpcRequest.getCompressSerializeMsgType());
         LRPCResponseBuilder.version(lrpcRequest.getVersion());
         LRPCResponseBuilder.payload(builder.build());
+        LRPCResponseBuilder.requestId(lrpcRequest.getRequestId());
         //写出相应
         channelHandlerContext.channel().writeAndFlush(LRPCResponseBuilder.build());
     }
 
     private Object invoke(RequestPayload payload) {
-        Object returnValue=null;
+        Object returnValue = null;
         try {
             String interfaceName = payload.getInterfaceName();
             Class<?>[] paramsType = payload.getParamsType();
@@ -55,7 +57,7 @@ public class ServiceInvokeHandler extends SimpleChannelInboundHandler<LRPCReques
             returnValue = method.invoke(res, params);
             return returnValue;
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-            log.error("方法调用失败:{}",e.getMessage());
+            log.error("方法调用失败:{}", e.getMessage());
             throw new RuntimeException(e);
         }
     }

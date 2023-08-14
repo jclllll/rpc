@@ -48,7 +48,7 @@ public class ReferenceProxyHandler implements InvocationHandler {
             .requestId(IdGenerator.getUid())
             .version(MessageFormatConstant.VERSION)
             .magic(MessageFormatConstant.MAGIC)
-            .compressSerializeMsgType(LRPCRequest.getCSMSetting(1, LRPCBootstrap.SERIALIZE.get(), 1))
+            .compressSerializeMsgType(LRPCRequest.getCSMSetting(LRPCBootstrap.COMPRESS.get(), LRPCBootstrap.SERIALIZE.get(), 1))
             .payload(payload)
             .build();
         //从缓存中取得一个Channel

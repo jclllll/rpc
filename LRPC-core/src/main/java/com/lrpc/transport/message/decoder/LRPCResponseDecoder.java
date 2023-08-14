@@ -1,6 +1,8 @@
 package com.lrpc.transport.message.decoder;
 
 import com.lrpc.transport.message.MessageFormatConstant;
+import com.lrpc.transport.message.compress.Compress;
+import com.lrpc.transport.message.compress.impl.CompressFactory;
 import com.lrpc.transport.message.response.LRPCResponse;
 import com.lrpc.transport.message.response.ResponsePayload;
 import com.lrpc.transport.message.serialize.impl.SerializeFactory;
@@ -66,9 +68,7 @@ public class LRPCResponseDecoder extends LengthFieldBasedFrameDecoder {
         byte[] bodyByte = new byte[bodyLength];
         obj.readBytes(bodyByte);
         //解压缩
-        if (compress == 1) {
-
-        }
+        bodyByte = CompressFactory.getCompress((int) compress).deCompress(bodyByte);
         //反序列化
         ResponsePayload payload = SerializeFactory.getSerialize((int) serialize).deSerialize(bodyByte);
         builder.compressSerializeMsgType(compressSerializeMsg);
