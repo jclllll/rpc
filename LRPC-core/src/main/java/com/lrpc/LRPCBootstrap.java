@@ -6,6 +6,7 @@ import com.lrpc.conf.RegistryConfig;
 import com.lrpc.conf.ServiceConfig;
 import com.lrpc.discovery.Registry;
 import com.lrpc.handler.ServiceInvokeHandler;
+import com.lrpc.transport.message.compress.impl.CompressFactory;
 import com.lrpc.transport.message.decoder.LRPCMessageDecoder;
 import com.lrpc.transport.message.encoder.LRPCResponseEncoder;
 import com.lrpc.transport.message.serialize.impl.SerializeFactory;
@@ -40,7 +41,14 @@ public class LRPCBootstrap {
     public final Map<InetSocketAddress, Channel> CHANNEL_MAP = new ConcurrentHashMap<>(16);
     public final Map<Long, CompletableFuture<Object>> PENDING_REQUEST = new ConcurrentHashMap<>(128);
 
-    public static Integer SERIALIZE = 0;
+    public static ThreadLocal<Integer> SERIALIZE = new ThreadLocal<>();
+    public static ThreadLocal<Integer> COMPRESS = new ThreadLocal<>();
+
+    static {
+        SERIALIZE.set(0);
+        COMPRESS.set(0);
+    }
+
     private int port;
     /**
      * 此处使用饿汉式单例
@@ -154,13 +162,24 @@ public class LRPCBootstrap {
         reference.setRegistry(registry);
         return this;
     }
-    public LRPCBootstrap serialize(String type){
-        Integer num = SerializeFactory.CACHE_NUM.get(type);
-        if(num==null){
-            log.error("序列化方式不支持:{}",type);
+
+    public LRPCBootstrap serialize(String type) {
+        Integer num = SerializeFactory.CACHE_NUM.get(type.toLowerCase());
+        if (num == null) {
+            log.error("序列化方式不支持:{}", type);
             throw new RuntimeException("序列化方式不支持");
         }
-        SERIALIZE = num;
+        SERIALIZE.set(num);
+        return this;
+    }
+
+    public LRPCBootstrap compress(String type) {
+        Integer num = CompressFactory.CACHE_NUM.get(type.toLowerCase());
+        if (num == null) {
+            log.error("压缩方式不支持:{}", type);
+            throw new RuntimeException("压缩方式不支持");
+        }
+        COMPRESS.set(num);
         return this;
     }
 }
