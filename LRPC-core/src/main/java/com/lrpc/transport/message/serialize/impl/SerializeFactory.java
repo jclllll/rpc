@@ -1,11 +1,14 @@
 package com.lrpc.transport.message.serialize.impl;
 
+import com.caucho.hessian.io.*;
 import com.lrpc.transport.message.serialize.Serialize;
 import com.lrpc.transport.message.serialize.exception.SerializeException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.*;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -16,26 +19,13 @@ final public class SerializeFactory {
 
     static {
         CACHE_NUM.put("jdk", 0);
-        CACHE_NUM.put("json", 1);
-        CACHE_NUM.put("hessian", 2);
+        CACHE_NUM.put("hessian", 1);
+        CACHE_SERIALIZE.put(0, new JDKSerialize());
+        CACHE_SERIALIZE.put(1, new HessianSerialize());
     }
 
     public static Serialize getSerialize(Integer num) {
-        if (num == null) {
-            log.error("序列化方式不被支持");
-            throw new SerializeException("序列化方式不支持");
-        }
-        if (CACHE_SERIALIZE.get(num) != null) {
-            return CACHE_SERIALIZE.get(num);
-        }
-        if (num == 0) {
-            CACHE_SERIALIZE.put(num, new JDKSerialize());
-        } else if (num == 1) {
-            CACHE_SERIALIZE.put(num, new JSONSerialize());
-        } else if (num == 2) {
-            CACHE_SERIALIZE.put(num, new HessianSerialize());
-        }
-        else{
+        if (num == null || !CACHE_SERIALIZE.containsKey(num)) {
             log.error("序列化方式不被支持");
             throw new SerializeException("序列化方式不支持");
         }
@@ -54,7 +44,7 @@ final public class SerializeFactory {
                 oos.writeObject(obj);
                 return baos.toByteArray();
             } catch (IOException e) {
-                log.error("序列化失败:{}",obj,e);
+                log.error("序列化失败:{}", obj, e);
                 throw new SerializeException(e);
             } finally {
                 try {
@@ -65,49 +55,36 @@ final public class SerializeFactory {
                         baos.close();
                     }
                 } catch (IOException e) {
-                    log.error("关闭流失败:",e);
+                    log.error("关闭流失败:", e);
                     throw new RuntimeException();
                 }
             }
         }
 
         @Override
-        public<T> T deSerialize(byte[] bytes) {
-            ObjectInputStream ois=null;
-            ByteArrayInputStream bais=null;
-            try{
-                bais=new ByteArrayInputStream(bytes);
-                ois=new ObjectInputStream(bais);
-                return (T)ois.readObject();
+        public <T> T deSerialize(byte[] bytes) {
+            ObjectInputStream ois = null;
+            ByteArrayInputStream bais = null;
+            try {
+                bais = new ByteArrayInputStream(bytes);
+                ois = new ObjectInputStream(bais);
+                return (T) ois.readObject();
             } catch (IOException | ClassNotFoundException e) {
-                log.error("反序列化失败:{}",e.getMessage());
+                log.error("反序列化失败:{}", e.getMessage());
                 throw new SerializeException(e);
             } finally {
                 try {
-                    if (bais != null){
+                    if (bais != null) {
                         bais.close();
                     }
-                    if(ois!=null){
+                    if (ois != null) {
                         ois.close();
                     }
                 } catch (IOException e) {
-                    log.error("关闭流失败",e);
+                    log.error("关闭流失败", e);
                     throw new RuntimeException(e);
                 }
             }
-        }
-    }
-
-    protected static class JSONSerialize implements Serialize {
-
-        @Override
-        public byte[] serialize(Object obj) {
-            return new byte[0];
-        }
-
-        @Override
-        public Object deSerialize(byte[] bytes) {
-            return null;
         }
     }
 
@@ -115,12 +92,71 @@ final public class SerializeFactory {
 
         @Override
         public byte[] serialize(Object obj) {
-            return new byte[0];
+            ByteArrayOutputStream baos = null;
+            HessianOutput ho = null;
+            try {
+                baos = new ByteArrayOutputStream();
+                ho = new HessianOutput(baos);
+                ho.writeObject(obj);
+                ho.flush();
+                return baos.toByteArray();
+            } catch (IOException e) {
+                log.error("序列化失败:{}", e.getMessage());
+                throw new SerializeException(e);
+            } finally {
+                try {
+                    if (baos != null) {
+                        baos.close();
+                    }
+                    if (ho != null) {
+                        ho.close();
+                    }
+                } catch (IOException e) {
+                    log.error("关闭流失败:{}", e.getMessage());
+                    throw new RuntimeException(e);
+                }
+            }
         }
 
         @Override
-        public Object deSerialize(byte[] bytes) {
+        public <T> T deSerialize(byte[] bytes) {
+            ByteArrayInputStream bais = null;
+            HessianInput hi = null;
+            try {
+                bais = new ByteArrayInputStream(bytes);
+                hi = new HessianInput(bais);
+                return (T) hi.readObject();
+            } catch (IOException e) {
+                log.error("反序列化失败:{}", e.getMessage());
+                throw new RuntimeException(e);
+            } catch (Exception e) {
+                log.error("{}", e.getMessage());
+            } finally {
+                try {
+                    if (bais != null) {
+                        bais.close();
+                    }
+                    if (hi != null) {
+                        hi.close();
+                    }
+                } catch (IOException e) {
+                    log.error("关闭流失败:{}", e.getMessage());
+                    throw new RuntimeException(e);
+                }
+            }
             return null;
         }
+    }
+
+
+    public static void registerSerialize(String name, int num, Serialize serialize) {
+        if (num > 0b111) {
+            throw new SerializeException("序列化器编号最大不能超过" + 0b111);
+        }
+        if (num == 0 || num == 1) {
+            throw new SerializeException("默认序列化器不可覆盖");
+        }
+        CACHE_NUM.put(name.toLowerCase(),num);
+        CACHE_SERIALIZE.put(num,serialize);
     }
 }
