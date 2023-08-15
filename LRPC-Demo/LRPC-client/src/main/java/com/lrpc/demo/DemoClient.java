@@ -21,7 +21,7 @@ public class DemoClient {
             .application("LRPC-consumer")
             .registry(new RegistryConfig("zookeeper://127.0.0.1:2181"))
             .serialize("hessian")
-            .compress("gzip")
+            .compress("snappY")
             .reference(reference);
 
         DemoApiHello demoApiHello = reference.get();
