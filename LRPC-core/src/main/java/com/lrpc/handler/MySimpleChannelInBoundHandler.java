@@ -14,6 +14,6 @@ public class MySimpleChannelInBoundHandler extends SimpleChannelInboundHandler<L
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, LRPCResponse response) throws Exception {
         ResponsePayload returnValue = (ResponsePayload)response.getPayload();
-        LRPCBootstrap.getInstance().PENDING_REQUEST.get(1L).complete(returnValue.getPayload());
+        LRPCBootstrap.getInstance().PENDING_REQUEST.get(response.getRequestId()).complete(returnValue.getPayload());
     }
 }

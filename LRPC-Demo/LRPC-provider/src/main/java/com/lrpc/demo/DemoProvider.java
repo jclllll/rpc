@@ -11,6 +11,7 @@ import com.lrpc.transport.message.serialize.Serialize;
 import com.lrpc.transport.message.serialize.impl.SerializeFactory;
 
 public class DemoProvider {
+    public static int port=8083;
     public static void main(String[] args) {
         ServiceConfig<DemoApiHello> server = new ServiceConfig<>();
         server.setInterfaceProvider(DemoApiHello.class);
@@ -18,7 +19,7 @@ public class DemoProvider {
 
         LRPCBootstrap.getInstance()
             .application("LRPC-provider")
-            .port(8081)
+            .port(port)
             .registry(new RegistryConfig("zookeeper://127.0.0.1:2181"))
             .protocol(new ProtocolConfig("jdk"))
 

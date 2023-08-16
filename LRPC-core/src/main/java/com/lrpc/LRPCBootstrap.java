@@ -6,6 +6,7 @@ import com.lrpc.conf.RegistryConfig;
 import com.lrpc.conf.ServiceConfig;
 import com.lrpc.discovery.Registry;
 import com.lrpc.handler.ServiceInvokeHandler;
+import com.lrpc.loadbalance.AbstractLoadBalancer;
 import com.lrpc.transport.message.compress.impl.CompressFactory;
 import com.lrpc.transport.message.decoder.LRPCMessageDecoder;
 import com.lrpc.transport.message.encoder.LRPCResponseEncoder;
@@ -39,14 +40,16 @@ public class LRPCBootstrap {
     private Registry registry;
     public final Map<String, ServiceConfig<?>> SERVICE_MAP = new ConcurrentHashMap<>(16);
     public final Map<InetSocketAddress, Channel> CHANNEL_MAP = new ConcurrentHashMap<>(16);
+    public final Map<String, List<InetSocketAddress>> CACHE_SERVICE_LIST = new ConcurrentHashMap<>(16);
+    public final Map<String, AbstractLoadBalancer> CACHE_INTERFACE_LOADBALANCE = new ConcurrentHashMap<>(16);
     public final Map<Long, CompletableFuture<Object>> PENDING_REQUEST = new ConcurrentHashMap<>(128);
 
-    public static ThreadLocal<Integer> SERIALIZE = new ThreadLocal<>();
-    public static ThreadLocal<Integer> COMPRESS = new ThreadLocal<>();
+    public static Integer SERIALIZE;
+    public static Integer COMPRESS;
 
     static {
-        SERIALIZE.set(0);
-        COMPRESS.set(0);
+        SERIALIZE = 0;
+        COMPRESS = 0;
     }
 
     private int port;
@@ -169,7 +172,7 @@ public class LRPCBootstrap {
             log.error("序列化方式不支持:{}", type);
             throw new RuntimeException("序列化方式不支持");
         }
-        SERIALIZE.set(num);
+        SERIALIZE = num;
         return this;
     }
 
@@ -179,7 +182,7 @@ public class LRPCBootstrap {
             log.error("压缩方式不支持:{}", type);
             throw new RuntimeException("压缩方式不支持");
         }
-        COMPRESS.set(num);
+        COMPRESS = num;
         return this;
     }
 }

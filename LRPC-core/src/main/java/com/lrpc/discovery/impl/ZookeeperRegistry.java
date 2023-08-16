@@ -52,7 +52,7 @@ public class ZookeeperRegistry extends AbstractRegistry {
     }
 
     @Override
-    public InetSocketAddress lookup(String serviceName) {
+    public List<InetSocketAddress> lookup(String serviceName) {
         String serviceNode = Constant.DEFAULT_PROVIDER_PATH + "/" + serviceName;
 
         List<String> children = ZookeeperUtil.getChildren(zooKeeper, serviceNode, null);
@@ -67,6 +67,6 @@ public class ZookeeperRegistry extends AbstractRegistry {
         if (inetSocketAddresses.size() == 0) {
             throw new NetworkException();
         }
-        return inetSocketAddresses.get(0);
+        return inetSocketAddresses;
     }
 }
