@@ -15,6 +15,7 @@ public class DemoClient {
         for(int i=0;i<1000000;i++){
 
         }
+
     }
 //    public static void main(String[] args) throws InterruptedException {
 //        ReferenceConfig<DemoApiHello> reference = new ReferenceConfig<>();
