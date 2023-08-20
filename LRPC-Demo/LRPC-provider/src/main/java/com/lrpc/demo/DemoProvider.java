@@ -8,7 +8,7 @@ import com.lrpc.demo.impl.DemoApiHelloImpl;
 
 
 public class DemoProvider {
-    public static int port=8085;
+    public static int port=8081;
     public static void main(String[] args) {
         ServiceConfig<DemoApiHello> server = new ServiceConfig<>();
         server.setInterfaceProvider(DemoApiHello.class);

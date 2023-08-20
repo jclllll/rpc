@@ -54,7 +54,7 @@ public class DemoClient {
 				} catch (BrokenBarrierException e) {
 					throw new RuntimeException(e);
 				}
-				for (int j = 0; j < 1000; j++) {
+				for (int j = 0; j < 10000; j++) {
 					String port = demoApiHello.sayHello("asd");
 					queue.add(port);
 				}
@@ -73,9 +73,9 @@ public class DemoClient {
 		}
 		System.out.println(map);
 		Integer[] num = new Integer[1];
-		num[0]=0;
+		num[0] = 0;
 		Collection<Integer> values = map.values();
-		values.forEach(it->num[0]+=it.intValue());
+		values.forEach(it -> num[0] += it.intValue());
 		System.out.println(num[0]);
 	}
 }

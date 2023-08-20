@@ -1,16 +1,16 @@
 package com.lrpc.loadbalance;
 
+import com.lrpc.IdGenerator;
 import com.lrpc.LRPCBootstrap;
+import com.sun.source.tree.Tree;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class ConsistentHashLoadBalance extends AbstractLoadBalancer {
@@ -52,7 +52,6 @@ public class ConsistentHashLoadBalance extends AbstractLoadBalancer {
 		for (InetSocketAddress address : addresses) {
 			putCircle(address);
 		}
-		log.error("虚拟节点数:{}", circle.size());
 		if (circle.size() != virtualNodes * addresses.size()) {
 			log.error("虚拟节点数量不正确:{},{}", circle.size(), virtualNodes * addresses.size());
 		}
@@ -61,16 +60,22 @@ public class ConsistentHashLoadBalance extends AbstractLoadBalancer {
 	private void putCircle(InetSocketAddress address) {
 		for (int i = 0; i < virtualNodes; i++) {
 			int hash = hash(address.toString() + "_" + i);
+			while (circle.containsKey(hash)) {
+				hash = hash(address.toString() + "_" + System.nanoTime());
+			}
 			log.info("node哈希值为:{}", hash);
 			circle.put(hash, address);
 		}
 	}
 
 	private int hash(String str) {
-		return md5(str).hashCode();
+		//16位byte
+		byte[] row = md5(str);
+		return new String(row).hashCode();
 	}
 
-	private synchronized String md5(String str) {
-		return Arrays.toString(md5.digest(str.getBytes(StandardCharsets.UTF_8)));
+	private synchronized byte[] md5(String str) {
+		return md5.digest(str.getBytes(StandardCharsets.UTF_8));
 	}
+
 }
