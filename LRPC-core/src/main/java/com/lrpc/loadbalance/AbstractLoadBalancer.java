@@ -4,9 +4,7 @@ import java.net.InetSocketAddress;
 import java.util.List;
 
 abstract public class AbstractLoadBalancer {
-    abstract protected InetSocketAddress loadBalance(List<InetSocketAddress>addresses);
+	abstract protected void loadBalance(List<InetSocketAddress> addresses);
 
-    public InetSocketAddress choiceNode(List<InetSocketAddress> addresses){
-        return loadBalance(addresses);
-    }
+	abstract public InetSocketAddress choiceNode();
 }

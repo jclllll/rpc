@@ -6,6 +6,7 @@ import com.lrpc.transport.message.MessageFormatConstant;
 import com.lrpc.transport.message.response.ResponsePayload;
 import com.lrpc.transport.message.serialize.impl.SerializeFactory;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import lombok.extern.slf4j.Slf4j;
@@ -49,7 +50,7 @@ public class LRPCResponseEncoder extends MessageToByteEncoder<LRPCResponse> {
         byteBuf.writeInt(MessageFormatConstant.HEADER_LENGTH + body.length);
         byteBuf.writerIndex(writerIndex);
         byteBuf.writeBytes(body);
-        channelHandlerContext.pipeline().writeAndFlush(byteBuf);
+        channelHandlerContext.pipeline().writeAndFlush(Unpooled.copiedBuffer(byteBuf));
     }
 
     private byte[] getPayloadBytes(ResponsePayload o) {

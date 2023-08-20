@@ -13,7 +13,7 @@ public class ChannelInitializerHandler extends ChannelInitializer<SocketChannel>
     @Override
     protected void initChannel(SocketChannel socketChannel) throws Exception {
         socketChannel.pipeline()
-            .addLast(new LoggingHandler(LogLevel.INFO))
+//            .addLast(new LoggingHandler(LogLevel.INFO))
             .addLast(new LRPCMessageEncoder())
             .addLast(new LRPCResponseDecoder())
             .addLast(new MySimpleChannelInBoundHandler());

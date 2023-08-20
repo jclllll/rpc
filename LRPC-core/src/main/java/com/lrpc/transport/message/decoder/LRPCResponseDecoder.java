@@ -73,6 +73,7 @@ public class LRPCResponseDecoder extends LengthFieldBasedFrameDecoder {
         ResponsePayload payload = SerializeFactory.getSerialize((int) serialize).deSerialize(bodyByte);
         builder.compressSerializeMsgType(compressSerializeMsg);
         builder.payload(payload);
+        obj.release();
         return builder.build();
     }
 }
